@@ -1,4 +1,6 @@
 import User from "../models/users.js";
+import bcrypt from "bcrypt";
+
 
 export const getUsers = async (req, res) => {
     try{
@@ -17,7 +19,8 @@ export const getUsers = async (req, res) => {
 export const addUsers = async (req, res) => {
     try{
         const {name, email, password} = req.body;
-        const user = new User({name, email, password});
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({name, email, password: hashedPassword});
         await user.save();
 
         return res.status(200).json({
@@ -37,6 +40,10 @@ export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const updateData = req.body;
+
+        if(updateData.password){
+            updateData.password = await bcrypt.hash(updateData.password, 10);
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
             id,
