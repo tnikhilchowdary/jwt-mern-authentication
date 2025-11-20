@@ -33,3 +33,51 @@ export const addUsers = async (req, res) => {
     }
 }
 
+export const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User Not Found" });
+        }
+
+        return res.status(200).json({
+            message: "User Updated Successfully",
+            user: updatedUser
+        });
+    } 
+    catch (error) {
+        console.error("Error In Updating Data", error);
+        return res.status(501).json({
+            message: "Error in Updating Data"
+        });
+    }
+};
+
+
+export const deleteUser = async (req, res) => {
+     try{
+        const {id} = req.params;
+        const deleteUser = await User.findByIdAndDelete(id);
+        if(!deleteUser){
+            console.log("User Not Found");
+        }
+
+        return res.status(201).json({
+            message:"Succesfully Deleted",
+            deleteUser: deleteUser
+        })
+     }
+     catch(error){
+        console.error("Error in Deleting", error);
+        return res.status(501).json({message:"Error in Deleting", error});
+     }
+}
+
